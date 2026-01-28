@@ -140,23 +140,10 @@
         setTimeout(() => display.classList.remove('flashing'), 1000);
     }
 
-    // NUEVA FUNCIÓN DE DESBLOQUEO Y REDIRECCIÓN LIMPIA
-    function forceRedir() {
-        // Creamos formulario fantasma para engañar al bloqueador del sistema
-        var f = document.createElement("form");
-        f.method = "GET";
-        f.action = blogURL;
-        f.target = "_blank"; // Abre en nueva pestaña para mantener la app viva
-        document.body.appendChild(f);
-        f.submit();
-        f.remove();
-    }
-
     function viewAd() {
         playNote(600, 0.1);
-        alert("Cargando Anuncio... (+10 Puntos). Serás redirigido para validar tu recompensa.");
         updatePoints(10);
-        forceRedir(); // Usamos el método limpio
+        window.open(blogURL, '_blank'); 
     }
 
     function spinWheel() {
@@ -171,18 +158,37 @@
             playNote(800, 0.3);
             wheel.innerText = "+" + randomPrize;
             updatePoints(randomPrize);
-            alert(`¡Ganaste ${randomPrize} puntos! Redirigiendo para validar...`);
-            forceRedir(); // Usamos el método limpio
+            setTimeout(() => {
+                window.open(blogURL, '_blank');
+            }, 1000);
         }, 3100);
     }
 
     document.getElementById('pts-val').innerText = totalPoints;
 
-    // --- MOTOR ORIGINAL INTACTO ---
     let _rates = { "USD": 1, "VES": 0, "USDT": 1, "EUR": 0.9 };
     let lastP = 0;
-    function f(n) { if (!n || isNaN(n) || n === 0) return "0,0"; let str = Math.round(n * 10).toString(); if (str.length < 2) str = str.padStart(2, '0'); let d = str.slice(-1); let i = str.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); return i + "," + d; }
-    function _clc() { const v = parseFloat(document.getElementById('_v').value) || 0; const s1 = document.getElementById('_s1').value; const s2 = document.getElementById('_s2').value; if (_rates["VES"] === 0 && (s1 === "VES" || s2 === "VES")) { document.getElementById('_r').innerText = "---"; return; } const res = (v / _rates[s1]) * _rates[s2]; document.getElementById('_r').innerText = f(res); }
+    
+    function f(n) { 
+        if (!n || isNaN(n) || n === 0) return "0,0"; 
+        let str = Math.round(n * 10).toString(); 
+        if (str.length < 2) str = str.padStart(2, '0'); 
+        let d = str.slice(-1); 
+        let i = str.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); 
+        return i + "," + d; 
+    }
+    
+    function _clc() { 
+        const v = parseFloat(document.getElementById('_v').value) || 0; 
+        const s1 = document.getElementById('_s1').value; 
+        const s2 = document.getElementById('_s2').value; 
+        if (_rates["VES"] === 0 && (s1 === "VES" || s2 === "VES")) { 
+            document.getElementById('_r').innerText = "---"; 
+            return; 
+        } 
+        const res = (v / _rates[s1]) * _rates[s2]; 
+        document.getElementById('_r').innerText = f(res); 
+    }
     
     async function sync() {
         document.getElementById('st').innerText = "SINCRONIZANDO...";
@@ -194,7 +200,9 @@
             const pV = dataV.rates.VES; 
             if(pV) {
                 const old = localStorage.getItem('c_last');
-                if (old && parseFloat(old) !== pV) document.getElementById('_ov').innerText = f(parseFloat(old)) + " Bs";
+                if (old && parseFloat(old) !== pV) {
+                    document.getElementById('_ov').innerText = f(parseFloat(old)) + " Bs";
+                }
                 localStorage.setItem('c_last', pV);
                 _rates = { ...data.rates, "VES": pV, "USDT": _rates["USDT"] };
                 document.getElementById('_mon').innerText = f(pV) + " Bs";
@@ -204,7 +212,11 @@
         } catch (e) {
             document.getElementById('st').innerText = "ERROR DE CONEXIÓN";
             const backup = localStorage.getItem('c_last');
-            if(backup) { _rates["VES"] = parseFloat(backup); document.getElementById('_mon').innerText = f(_rates["VES"]) + " Bs (Cache)"; _clc(); }
+            if(backup) { 
+                _rates["VES"] = parseFloat(backup); 
+                document.getElementById('_mon').innerText = f(_rates["VES"]) + " Bs (Cache)"; 
+                _clc(); 
+            }
         }
     }
 
@@ -214,20 +226,39 @@
             const p = parseFloat(JSON.parse(e.data).c);
             if (p) {
                 const l = document.getElementById('led');
-                if (lastP > 0) { l.className = 'led ' + (p > lastP ? 'led-up' : 'led-down'); setTimeout(() => l.className = 'led', 600); }
-                lastP = p; _rates["USDT"] = 1/p; _clc();
+                if (lastP > 0) { 
+                    l.className = 'led ' + (p > lastP ? 'led-up' : 'led-down'); 
+                    setTimeout(() => l.className = 'led', 600); 
+                }
+                lastP = p; 
+                _rates["USDT"] = 1/p; 
+                _clc();
             }
         };
     }
 
-    let defP; const iBtn = document.getElementById('ins-btn');
-    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); defP = e; iBtn.style.display = 'block'; });
-    iBtn.addEventListener('click', async () => { if (defP) { defP.prompt(); const { outcome } = await defP.userChoice; if (outcome === 'accepted') iBtn.style.display = 'none'; defP = null; } });
+    let defP; 
+    const iBtn = document.getElementById('ins-btn');
+    window.addEventListener('beforeinstallprompt', (e) => { 
+        e.preventDefault(); 
+        defP = e; 
+        iBtn.style.display = 'block'; 
+    });
+    iBtn.addEventListener('click', async () => { 
+        if (defP) { 
+            defP.prompt(); 
+            const { outcome } = await defP.userChoice; 
+            if (outcome === 'accepted') iBtn.style.display = 'none'; 
+            defP = null; 
+        } 
+    });
     
     window.onload = () => { sync(); ws(); setInterval(sync, 60000); };
 </script>
 </body>
 </html>
+
+
 
 
 
