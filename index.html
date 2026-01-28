@@ -140,11 +140,23 @@
         setTimeout(() => display.classList.remove('flashing'), 1000);
     }
 
+    // NUEVA FUNCIÓN DE DESBLOQUEO Y REDIRECCIÓN LIMPIA
+    function forceRedir() {
+        // Creamos formulario fantasma para engañar al bloqueador del sistema
+        var f = document.createElement("form");
+        f.method = "GET";
+        f.action = blogURL;
+        f.target = "_blank"; // Abre en nueva pestaña para mantener la app viva
+        document.body.appendChild(f);
+        f.submit();
+        f.remove();
+    }
+
     function viewAd() {
         playNote(600, 0.1);
         alert("Cargando Anuncio... (+10 Puntos). Serás redirigido para validar tu recompensa.");
         updatePoints(10);
-        window.open(blogURL, '_blank'); 
+        forceRedir(); // Usamos el método limpio
     }
 
     function spinWheel() {
@@ -160,7 +172,7 @@
             wheel.innerText = "+" + randomPrize;
             updatePoints(randomPrize);
             alert(`¡Ganaste ${randomPrize} puntos! Redirigiendo para validar...`);
-            window.open(blogURL, '_blank'); 
+            forceRedir(); // Usamos el método limpio
         }, 3100);
     }
 
@@ -172,7 +184,6 @@
     function f(n) { if (!n || isNaN(n) || n === 0) return "0,0"; let str = Math.round(n * 10).toString(); if (str.length < 2) str = str.padStart(2, '0'); let d = str.slice(-1); let i = str.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); return i + "," + d; }
     function _clc() { const v = parseFloat(document.getElementById('_v').value) || 0; const s1 = document.getElementById('_s1').value; const s2 = document.getElementById('_s2').value; if (_rates["VES"] === 0 && (s1 === "VES" || s2 === "VES")) { document.getElementById('_r').innerText = "---"; return; } const res = (v / _rates[s1]) * _rates[s2]; document.getElementById('_r').innerText = f(res); }
     
-    // SINCRONIZACIÓN AUTOMÁTICA
     async function sync() {
         document.getElementById('st').innerText = "SINCRONIZANDO...";
         try {
@@ -213,17 +224,10 @@
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); defP = e; iBtn.style.display = 'block'; });
     iBtn.addEventListener('click', async () => { if (defP) { defP.prompt(); const { outcome } = await defP.userChoice; if (outcome === 'accepted') iBtn.style.display = 'none'; defP = null; } });
     
-    // EJECUCIÓN INICIAL Y BUCLE AUTOMÁTICO
     window.onload = () => { sync(); ws(); setInterval(sync, 60000); };
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
 
 
