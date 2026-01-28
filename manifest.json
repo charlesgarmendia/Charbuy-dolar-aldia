@@ -1,21 +1,36 @@
 {
-  "name": "CharBuy Global",
   "short_name": "CharBuy",
-  "description": "Calculadora de divisas con tasa exacta de Dólar al Día y Binance.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#FF9800",
-  "orientation": "portrait",
+  "name": "CharBuy Global - Tasas en Vivo",
   "icons": [
     {
       "src": "icon-512.png",
-      "sizes": "512x512",
       "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#080808",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#FF9800",
+  "shortcuts": [
+    {
+      "name": "Ver Tasas",
+      "short_name": "Tasas",
+      "url": "/",
+      "icons": [{ "src": "icon-512.png", "sizes": "512x512" }]
     }
   ]
 }
+
+
+
+
+
+
+
+
 
 
 

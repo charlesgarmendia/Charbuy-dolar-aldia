@@ -1,46 +1,77 @@
 const CACHE_NAME = 'charbuy-v1';
 const ASSETS = [
-  './',
-  'index.html',
-  'manifest.json',
-  'ads.txt',
-  'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-512.png'
 ];
 
-// Instalación: Guarda los archivos esenciales
+// Instalación: Forzar que el nuevo SW tome el control de inmediato
 self.addEventListener('install', (e) => {
-  self.skipWaiting();
+  self.skipWaiting(); 
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS);
+    })
   );
 });
 
-// Activación: Limpia versiones viejas de la App
+// Activación: Limpiar caches antiguos para evitar errores de versión
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
       );
     }).then(() => self.clients.claim())
   );
 });
 
-// Estrategia de Red: Intenta internet primero, si falla usa caché
+// Fetch: Lógica inteligente para no cachear las APIs de precios
 self.addEventListener('fetch', (e) => {
-  // EXCLUSIÓN CRÍTICA: No interferir con AdSense ni con las APIs de precios en tiempo real
-  if (
-    e.request.url.includes('googlesyndication') || 
-    e.request.url.includes('pagead') ||
-    e.request.url.includes('open.er-api.com') ||
-    e.request.url.includes('exchangerate-api.com')
-  ) {
-    return; 
+  const url = new URL(e.request.url);
+
+  // NO CACHEAR peticiones a APIs de divisas o WebSockets para que siempre sean reales
+  if (url.hostname.includes('er-api.com') || 
+      url.hostname.includes('exchangerate-api.com') || 
+      url.hostname.includes('binance.com')) {
+    e.respondWith(fetch(e.request));
+    return;
   }
 
+  // Para el resto (HTML, CSS, Iconos), usar Caché primero, luego Red
   e.respondWith(
-    fetch(e.request).catch(() => {
-      return caches.match(e.request);
+    caches.match(e.request).then((res) => {
+      return res || fetch(e.request).then((response) => {
+        // Guardar en caché nuevas peticiones válidas
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+        let responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(e.request, responseToCache);
+        });
+        return response;
+      });
+    }).catch(() => {
+      // Si falla todo y es una navegación, podrías retornar la página de inicio
+      return caches.match('/');
     })
   );
 });
+
+
+
+
+
+
+
+
+
+
+
+
