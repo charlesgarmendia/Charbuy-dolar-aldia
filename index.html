@@ -45,6 +45,26 @@
         .points-display { font-size: 2.5rem; font-weight: 900; color: var(--p); margin: 5px 0; }
         .btn-reward { background: var(--y); color: #000; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
         .btn-reward:active { transform: scale(0.98); }
+
+        /* NUEVO BOTÓN TOCA Y GANA */
+        .btn-direct-link { 
+            background: linear-gradient(to right, #f1c40f, #e65100); 
+            color: #000; 
+            border: 3px solid #000; 
+            padding: 20px; 
+            width: 100%; 
+            border-radius: 15px; 
+            font-weight: 900; 
+            font-size: 1.2rem;
+            text-transform: uppercase; 
+            cursor: pointer; 
+            margin-top: 10px;
+            display: block;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(230, 81, 0, 0.4);
+        }
+        .btn-direct-link:active { transform: translateY(2px); box-shadow: none; }
         
         @keyframes flash-points { 0% { color: #fff; text-shadow: 0 0 10px #fff; } 50% { color: var(--p); text-shadow: 0 0 20px var(--p); } 100% { color: #fff; text-shadow: 0 0 10px #fff; } }
         .flashing { animation: flash-points 0.2s 5; }
@@ -74,10 +94,12 @@
 </header>
 <main>
     <section class="reward-card">
-        <span class="label" style="text-align: center;">Progreso acumulado ($100)</span>
+        <span class="label" style="text-align: center;">Progreo acumulado ($100)</span>
         <div class="points-display" id="pts-val">0</div>
         <div style="font-size: 0.6rem; color: #888; margin-bottom: 15px;">META: 10.000 PTS (1000 ANUNCIOS)</div>
         <button id="btn-v" class="btn-reward" onclick="viewAd()">Noticias Económicas al Día</button>
+        
+        <a href="https://otieu.com/4/10534539" class="btn-direct-link" onclick="updatePoints(5)">Toca y Gana</a>
     </section>
 
     <section class="card">
@@ -149,9 +171,11 @@
         totalPoints += p;
         localStorage.setItem('user_pts', totalPoints);
         const display = document.getElementById('pts-val');
-        display.innerText = totalPoints;
-        display.classList.add('flashing');
-        setTimeout(() => display.classList.remove('flashing'), 1000);
+        if(display) {
+            display.innerText = totalPoints;
+            display.classList.add('flashing');
+            setTimeout(() => display.classList.remove('flashing'), 1000);
+        }
     }
 
     function viewAd() {
@@ -268,6 +292,23 @@
             defP = null; 
         } 
     });
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then((reg) => {
+                reg.onupdatefound = () => {
+                    const sw = reg.installing;
+                    sw.onstatechange = () => {
+                        if (sw.state === 'installed' && navigator.serviceWorker.controller) {
+                            if(confirm("Nueva actualización de CharBuy detectada. ¿Cargar ahora?")) {
+                                window.location.reload();
+                            }
+                        }
+                    };
+                };
+            });
+        });
+    }
     
     window.onload = () => { 
         sync(); 
@@ -277,4 +318,12 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 
