@@ -14,7 +14,7 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4637073064890854" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet" />
     <style>
-        :root { --p: #FF9800; --b: #080808; --c: #141414; --t: #ffffff; --g: #2ecc71; --r: #ff4757; }
+        :root { --p: #FF9800; --b: #080808; --c: #141414; --t: #ffffff; --g: #2ecc71; --r: #ff4757; --y: #f1c40f; --gold: #ffd700; }
         * { box-sizing: border-box; outline: none; }
         body { font-family: 'Poppins', sans-serif; background: var(--b); color: var(--t); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .header-app { width: 100%; height: 160px; background: radial-gradient(circle at top right, #e65100, #000000 85%); display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 3px solid var(--p); }
@@ -43,14 +43,25 @@
         /* MODULO RECOMPENSAS */
         .reward-card { background: linear-gradient(145deg, #1a1a1a, #000); border: 2px solid var(--p); padding: 20px; border-radius: 24px; text-align: center; }
         .points-display { font-size: 2.5rem; font-weight: 900; color: var(--p); margin: 5px 0; }
-        .btn-reward { background: var(--p); color: #000; border: none; padding: 15px; width: 100%; border-radius: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; }
-        .wheel-container { margin: 15px auto; width: 100px; height: 100px; border: 3px solid var(--p); border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; background: #111; }
-        .wheel-pointer { position: absolute; top: 0; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 12px solid var(--r); z-index: 10; }
+        .btn-reward { background: var(--y); color: #000; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
+        .btn-reward:active { transform: scale(0.98); }
         
         @keyframes flash-points { 0% { color: #fff; text-shadow: 0 0 10px #fff; } 50% { color: var(--p); text-shadow: 0 0 20px var(--p); } 100% { color: #fff; text-shadow: 0 0 10px #fff; } }
         .flashing { animation: flash-points 0.2s 5; }
 
         #ins-btn { display: none; position: fixed; bottom: 20px; width: 90%; max-width: 400px; background: var(--p); color: #000; padding: 18px; border-radius: 20px; z-index: 9999; font-weight: 900; text-transform: uppercase; border: none; box-shadow: 0 10px 40px rgba(255,152,0,0.4); cursor: pointer; }
+
+        /* BANNERS CON BORDE DORADO DOBLE */
+        .monetag-stack { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 20px 0; }
+        .m-banner { 
+            width: 100%; 
+            min-height: 50px; 
+            display: flex; 
+            justify-content: center; 
+            border: 4px double var(--gold); 
+            border-radius: 8px; 
+            padding: 2px;
+        }
     </style>
 </head>
 <body>
@@ -66,12 +77,7 @@
         <span class="label" style="text-align: center;">Progreso acumulado ($100)</span>
         <div class="points-display" id="pts-val">0</div>
         <div style="font-size: 0.6rem; color: #888; margin-bottom: 15px;">META: 10.000 PTS (1000 ANUNCIOS)</div>
-        <button id="btn-v" class="btn-reward" onclick="viewAd()">Ganar Premio (Anuncio +10)</button>
-        <div class="wheel-container">
-            <div class="wheel-pointer"></div>
-            <div id="wheel-inner" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99); font-weight: 900; font-size: 1.2rem; color: var(--p);">?</div>
-        </div>
-        <button id="btn-s" class="btn-reward" style="background: #333; color: var(--p);" onclick="spinWheel()">Girar Ruleta Fortuna</button>
+        <button id="btn-v" class="btn-reward" onclick="viewAd()">Noticias Económicas al Día</button>
     </section>
 
     <section class="card">
@@ -111,6 +117,14 @@
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
+    <div class="monetag-stack">
+        <div class="m-banner"><script async="async" data-cfasync="false" src="//otieu.com/4/10534539"></script></div>
+        <div class="m-banner"><script async="async" data-cfasync="false" src="//otieu.com/4/10534539"></script></div>
+        <div class="m-banner"><script async="async" data-cfasync="false" src="//otieu.com/4/10534539"></script></div>
+        <div class="m-banner"><script async="async" data-cfasync="false" src="//otieu.com/4/10534539"></script></div>
+        <div class="m-banner"><script async="async" data-cfasync="false" src="//otieu.com/4/10534539"></script></div>
+    </div>
+
     <section class="privacy-box">
         <h3>Política de Privacidad</h3>
         <p><b>CharBuy Global</b> sincroniza tasas en tiempo real con fuentes globales y de mercado. Este sitio utiliza cookies de Google AdSense para ofrecer publicidad personalizada a sus usuarios.</p>
@@ -148,31 +162,9 @@
         window.open(blogURL, '_blank'); 
         setTimeout(() => {
             updatePoints(10);
-            b.innerText = "Ganar Premio (Anuncio +10)";
+            b.innerText = "Noticias Económicas al Día";
             b.disabled = false;
         }, 5000); 
-    }
-
-    function spinWheel() {
-        let iv = setInterval(() => playNote(400, 0.05), 100);
-        const wheel = document.getElementById('wheel-inner');
-        const prizes = [5, 10, 15, 20, 30];
-        const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
-        const deg = Math.floor(Math.random() * 360) + 1080; 
-        const b = document.getElementById('btn-s');
-        b.disabled = true;
-        wheel.style.transform = `rotate(${deg}deg)`;
-        setTimeout(() => {
-            clearInterval(iv);
-            playNote(800, 0.3);
-            wheel.innerText = "+" + randomPrize;
-            window.open(blogURL, '_blank');
-            setTimeout(() => {
-                updatePoints(randomPrize);
-                wheel.innerText = "?";
-                b.disabled = false;
-            }, 3000);
-        }, 3100);
     }
 
     document.getElementById('pts-val').innerText = totalPoints;
@@ -201,8 +193,21 @@
         document.getElementById('_r').innerText = f(res); 
     }
     
+    async function syncUSDT() {
+        try {
+            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDTUSDC');
+            const data = await res.json();
+            const p = parseFloat(data.price);
+            if(p) {
+                _rates["USDT"] = 1/p;
+                _clc();
+            }
+        } catch(e) { console.log("Error USDT API"); }
+    }
+
     async function sync() {
         document.getElementById('st').innerText = "SINCRONIZANDO...";
+        await syncUSDT();
         try {
             const res = await fetch('https://open.er-api.com/v6/latest/USD');
             const data = await res.json();
@@ -272,7 +277,6 @@
 </script>
 </body>
 </html>
-
 
 
 
