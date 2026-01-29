@@ -1,4 +1,4 @@
-const CACHE_NAME = 'charbuy-cache-v1.0.1';
+const CACHE_NAME = 'charbuy-cache-v1.0.2'; // Incrementado para forzar actualización
 const ASSETS = [
   './',
   './index.html',
@@ -14,7 +14,7 @@ self.addEventListener('install', (e) => {
   self.skipWaiting();
 });
 
-// Activación y limpieza de versiones viejas
+// Activación y limpieza
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => {
@@ -28,18 +28,24 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Estrategia de respuesta
+// Intercepción de peticiones (CORREGIDO PARA ANUNCIOS)
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
   
-  // No cachear anuncios ni APIs de tasas para mantener precisión en Bolívares/Dólares
-  if (url.hostname.includes('googlesyndication') || 
+  // EXCLUSIONES CRÍTICAS: Si la URL es de anuncios o APIs de tasas, NO USAR CACHÉ
+  if (
+      url.hostname.includes('googlesyndication.com') || 
+      url.hostname.includes('doubleclick.net') ||
       url.hostname.includes('otieu.com') || 
       url.hostname.includes('api.binance.com') ||
-      url.hostname.includes('exchangerate-api.com')) {
-    return; 
+      url.hostname.includes('exchangerate-api.com') ||
+      url.hostname.includes('open.er-api.com')
+  ) {
+    // Retornamos directamente de la red para asegurar impresiones y tasas reales
+    return e.respondWith(fetch(e.request));
   }
 
+  // Para el resto (HTML, CSS, Iconos), usamos estrategia Cache First
   e.respondWith(
     caches.match(e.request).then((res) => {
       return res || fetch(e.request);
