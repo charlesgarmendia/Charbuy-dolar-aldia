@@ -1,4 +1,4 @@
-const CACHE_NAME = 'charbuy-cache-v1.0.3'; 
+const CACHE_NAME = 'charbuy-final-v1';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -7,20 +7,18 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.map((k) => k !== CACHE_NAME && caches.delete(k)))));
+  e.waitUntil(caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))));
   self.clients.claim();
 });
 
+// Bypass total: Si el archivo no está en la lista de ASSETS, 
+// el Service Worker ni siquiera lo mira.
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+  const isStaticAsset = ASSETS.some(asset => e.request.url.includes(asset.replace('./', '')));
 
-  // REGLA DE ORO: Si es publicidad o APIs, salir del Service Worker inmediatamente
-  if (url.hostname.includes('otieu.com') || 
-      url.hostname.includes('googlesyndication') || 
-      url.hostname.includes('doubleclick') ||
-      url.hostname.includes('api.binance.com') ||
-      url.hostname.includes('exchangerate-api.com')) {
-    return; // No usamos e.respondWith, dejamos que el navegador lo maneje solo
+  if (!isStaticAsset) {
+    return; // El navegador maneja la publicidad por su cuenta
   }
 
   e.respondWith(
